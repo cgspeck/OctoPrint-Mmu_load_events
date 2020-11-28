@@ -1,0 +1,4 @@
+include README.md
+recursive-include octoprint_mmu_events/templates *
+recursive-include octoprint_mmu_events/translations *
+recursive-include octoprint_mmu_events/static *
