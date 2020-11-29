@@ -1,5 +1,5 @@
 # coding=utf-8
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 ### (Don't forget to remove me)
 # This is a basic skeleton for your plugin's __init__.py. You probably want to adjust the class name of your plugin
@@ -13,47 +13,53 @@ import octoprint.plugin
 
 class Mmu_eventsPlugin(octoprint.plugin.SettingsPlugin,
                        octoprint.plugin.AssetPlugin,
-                       octoprint.plugin.TemplatePlugin):
+                       octoprint.plugin.TemplatePlugin,
+                       octoprint.plugin.StartupPlugin
+):
 
-	##~~ SettingsPlugin mixin
+    ##__ StartupPlugin
+    def on_after_startup(self):
+        self._logger.info("XXXXXXXXXXXXX hello world XXXXXXXXXXXXXXX")
 
-	def get_settings_defaults(self):
-		return dict(
-			# put your plugin's default settings here
-		)
+    ##~~ SettingsPlugin mixin
 
-	##~~ AssetPlugin mixin
+    def get_settings_defaults(self):
+        return dict(
+            # put your plugin's default settings here
+        )
 
-	def get_assets(self):
-		# Define your plugin's asset files to automatically include in the
-		# core UI here.
-		return dict(
-			js=["js/mmu_events.js"],
-			css=["css/mmu_events.css"],
-			less=["less/mmu_events.less"]
-		)
+    ##~~ AssetPlugin mixin
 
-	##~~ Softwareupdate hook
+    def get_assets(self):
+        # Define your plugin's asset files to automatically include in the
+        # core UI here.
+        return dict(
+            js=["js/mmu_events.js"],
+            css=["css/mmu_events.css"],
+            less=["less/mmu_events.less"]
+        )
 
-	def get_update_information(self):
-		# Define the configuration for your plugin to use with the Software Update
-		# Plugin here. See https://docs.octoprint.org/en/master/bundledplugins/softwareupdate.html
-		# for details.
-		return dict(
-			mmu_events=dict(
-				displayName="Mmu_events Plugin",
-				displayVersion=self._plugin_version,
+    ##~~ Softwareupdate hook
 
-				# version check: github repository
-				type="github_release",
-				user="cgspeck",
-				repo="OctoPrint-Mmu_events",
-				current=self._plugin_version,
+    def get_update_information(self):
+        # Define the configuration for your plugin to use with the Software Update
+        # Plugin here. See https://docs.octoprint.org/en/master/bundledplugins/softwareupdate.html
+        # for details.
+        return dict(
+            mmu_events=dict(
+                displayName="Mmu_events Plugin",
+                displayVersion=self._plugin_version,
 
-				# update method: pip
-				pip="https://github.com/cgspeck/OctoPrint-Mmu_events/archive/{target_version}.zip"
-			)
-		)
+                # version check: github repository
+                type="github_release",
+                user="cgspeck",
+                repo="OctoPrint-Mmu_events",
+                current=self._plugin_version,
+
+                # update method: pip
+                pip="https://github.com/cgspeck/OctoPrint-Mmu_events/archive/{target_version}.zip"
+            )
+        )
 
 
 # If you want your plugin to be registered within OctoPrint under a different name than what you defined in setup.py
@@ -66,14 +72,14 @@ __plugin_name__ = "Mmu_events Plugin"
 # compatibility flags according to what Python versions your plugin supports!
 #__plugin_pythoncompat__ = ">=2.7,<3" # only python 2
 #__plugin_pythoncompat__ = ">=3,<4" # only python 3
-#__plugin_pythoncompat__ = ">=2.7,<4" # python 2 and 3
+__plugin_pythoncompat__ = ">=2.7,<4" # python 2 and 3
 
 def __plugin_load__():
-	global __plugin_implementation__
-	__plugin_implementation__ = Mmu_eventsPlugin()
+    global __plugin_implementation__
+    __plugin_implementation__ = Mmu_eventsPlugin()
 
-	global __plugin_hooks__
-	__plugin_hooks__ = {
-		"octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
-	}
+    global __plugin_hooks__
+    __plugin_hooks__ = {
+        "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
+    }
 
