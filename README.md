@@ -15,3 +15,13 @@ the plugin manager.
 ## Configuration
 
 **TODO:** Describe your plugin's configuration options (if any).
+
+## Testing with Virtual printer
+
+Use the following commands in the Terminal to trigger this plugin:
+
+```
+!!DEBUG:send MMU can_load:OOOooooooOOOOOOOOOOO succeeded.
+!!DEBUG:send MMU can_load:OOOooooooOOOOOOOOOOO failed.
+!!DEBUG:send MMU can_load:OOOooooooOOOOOOOOOOO foo bar
+```
