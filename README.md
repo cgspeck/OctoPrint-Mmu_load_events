@@ -23,7 +23,7 @@ In the case of a `FAILED` message, only `line` will be present.
 Install via the bundled [Plugin Manager](https://docs.octoprint.org/en/master/bundledplugins/pluginmanager.html)
 or manually using this URL:
 
-    https://github.com/cgspeck/OctoPrint-MMU_load_events/archive/master.zip
+    https://github.com/cgspeck/OctoPrint-MMU_load_events/archive/main.zip
 
 Subscribe to events by creating/adding to the events section in Octoprint's `~/.octoprint/config.yaml`:
 
