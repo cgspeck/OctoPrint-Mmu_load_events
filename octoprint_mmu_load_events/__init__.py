@@ -19,7 +19,7 @@ class Mmu_load_eventsPlugin(
 
     ##~~ To process recieved gcode
     @staticmethod
-    def handle_gcode_received(comm_instance, line: str, *args, **kwargs):
+    def handle_gcode_received(_comm_instance, line: str, *args, **kwargs):
         if line.startswith("MMU can_load:"):
             logger = logging.getLogger("octoprint.plugin." + __name__)
             parts = line.split(" ")
@@ -35,7 +35,6 @@ class Mmu_load_eventsPlugin(
                 filament_detect = parts[-2].split(":")[-1]
                 logger.info("Load MMU status: {}, filament detected: '{}'".format(result_str, filament_detect))
                 eventManager().fire(result_evt, {"line": line, "filamentDetect": filament_detect, "success": succeeded})
-                pass
             else:
                 logger.warning("Unable to determine MMU status, received '{}'".format(line))
                 eventManager().fire(Mmu_load_eventsPlugin.UNKNOWN_EVENT, {"line": line})

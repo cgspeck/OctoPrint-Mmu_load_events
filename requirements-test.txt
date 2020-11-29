@@ -1,0 +1,5 @@
+# these are already present in the OctoPrint venv, which is what the tests use
+pytest==6.1.1
+pytest-mock==3.3.1
+# OctoPrint==1.4.2
+-r requirements.txt
