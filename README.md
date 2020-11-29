@@ -45,6 +45,8 @@ events:
       type: system
 ```
 
+The `node-red/` folder contains a sample flow and the helper script I use to dispatch these events via email and [Pushover](https://pushover.net/).
+
 ## Configuration
 
 There is no configuration.
