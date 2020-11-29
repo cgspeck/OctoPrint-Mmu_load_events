@@ -1,11 +1,11 @@
 /*
- * View model for OctoPrint-Mmu_events
+ * View model for OctoPrint-Mmu_load_events
  *
  * Author: Chris Speck
  * License: AGPLv3
  */
-$(function() {
-    function Mmu_eventsViewModel(parameters) {
+$(function () {
+    function Mmu_load_eventsViewModel(parameters) {
         var self = this;
 
         // assign the injected parameters, e.g.:
@@ -20,10 +20,14 @@ $(function() {
      * and a full list of the available options.
      */
     OCTOPRINT_VIEWMODELS.push({
-        construct: Mmu_eventsViewModel,
+        construct: Mmu_load_eventsViewModel,
         // ViewModels your plugin depends on, e.g. loginStateViewModel, settingsViewModel, ...
-        dependencies: [ /* "loginStateViewModel", "settingsViewModel" */ ],
-        // Elements to bind to, e.g. #settings_plugin_mmu_events, #tab_plugin_mmu_events, ...
-        elements: [ /* ... */ ]
+        dependencies: [
+            /* "loginStateViewModel", "settingsViewModel" */
+        ],
+        // Elements to bind to, e.g. #settings_plugin_mmu_load_events, #tab_plugin_mmu_load_events, ...
+        elements: [
+            /* ... */
+        ],
     });
 });

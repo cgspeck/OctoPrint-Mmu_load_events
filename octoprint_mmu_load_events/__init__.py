@@ -13,15 +13,16 @@ import logging
 import octoprint.plugin
 from octoprint.events import eventManager
 
-class Mmu_eventsPlugin(octoprint.plugin.SettingsPlugin,
-                       octoprint.plugin.AssetPlugin,
-                       octoprint.plugin.TemplatePlugin,
-                       octoprint.plugin.StartupPlugin,
-                       octoprint.plugin.EventHandlerPlugin
+class Mmu_load_eventsPlugin(
+    octoprint.plugin.SettingsPlugin,
+    octoprint.plugin.AssetPlugin,
+    octoprint.plugin.TemplatePlugin,
+    octoprint.plugin.StartupPlugin,
+    octoprint.plugin.EventHandlerPlugin
 ):
-    FAILED_EVENT = "PLUGIN_MMU_EVENTS_LOAD_FAILED"
-    SUCCESS_EVENT = "PLUGIN_MMU_EVENTS_LOAD_SUCCESS"
-    UNKNOWN_EVENT = "PLUGIN_MMU_EVENTS_LOAD_UNKNOWN"
+    FAILED_EVENT = "PLUGIN_MMU_LOAD_EVENTS_FAILED"
+    SUCCESS_EVENT = "PLUGIN_MMU_LOAD_EVENTS_SUCCESS"
+    UNKNOWN_EVENT = "PLUGIN_MMU_LOAD_EVENTS_UNKNOWN"
 
     ##~~ To process recieved gcode
     @staticmethod
@@ -35,8 +36,8 @@ class Mmu_eventsPlugin(octoprint.plugin.SettingsPlugin,
                 succeeded = result_part == "succeeded."
                 result_str = ("failed", "succeded")[succeeded]
                 result_evt = (
-                    Mmu_eventsPlugin.FAILED_EVENT,
-                    Mmu_eventsPlugin.SUCCESS_EVENT)[succeeded]
+                    Mmu_load_eventsPlugin.FAILED_EVENT,
+                    Mmu_load_eventsPlugin.SUCCESS_EVENT)[succeeded]
 
                 filament_detect = parts[-2].split(":")[-1]
                 logger.info("Load MMU status: {}, filament detected: '{}'".format(result_str, filament_detect))
@@ -44,16 +45,15 @@ class Mmu_eventsPlugin(octoprint.plugin.SettingsPlugin,
                 pass
             else:
                 logger.warning("Unable to determine MMU status, received '{}'".format(line))
-                eventManager().fire(Mmu_eventsPlugin.UNKNOWN_EVENT, {"line": line})
+                eventManager().fire(Mmu_load_eventsPlugin.UNKNOWN_EVENT, {"line": line})
 
         return line
 
     ##~~ These events are sent by the hook above
     @staticmethod
     def register_custom_events_hook(*args, **kwargs):
-        # plugin_mmu_events_foo
-        # PLUGIN_MMU_EVENTS_LOAD_SUCCESS
-        return ["load_success", "load_failed", "load_unknown"]
+        # PLUGIN_MMU_LOAD_EVENTS_SUCCESS, PLUGIN_MMU_LOAD_EVENTS_FAILED, PLUGIN_MMU_LOAD_EVENTS_UNKNOWN
+        return ["success", "failed", "unknown"]
 
     ##~~ EventHandlerPlugin
     def on_event(self, event, payload):
@@ -61,7 +61,7 @@ class Mmu_eventsPlugin(octoprint.plugin.SettingsPlugin,
 
     ##~~ StartupPlugin
     def on_after_startup(self):
-        self._logger.info("XXXXXXXXXXXXX hello world XXXXXXXXXXXXXXX")
+        self._logger.info("MMU Load Events plugin saying g'day!")
 
     ##~~ SettingsPlugin mixin
 
@@ -82,9 +82,9 @@ class Mmu_eventsPlugin(octoprint.plugin.SettingsPlugin,
         # Define your plugin's asset files to automatically include in the
         # core UI here.
         return dict(
-            js=["js/mmu_events.js"],
-            css=["css/mmu_events.css"],
-            less=["less/mmu_events.less"]
+            js=["js/mmu_load_events.js"],
+            css=["css/mmu_load_events.css"],
+            less=["less/mmu_load_events.less"]
         )
 
     ##~~ Softwareupdate hook
@@ -94,18 +94,18 @@ class Mmu_eventsPlugin(octoprint.plugin.SettingsPlugin,
         # Plugin here. See https://docs.octoprint.org/en/master/bundledplugins/softwareupdate.html
         # for details.
         return dict(
-            mmu_events=dict(
-                displayName="Mmu_events Plugin",
+            mmu_load_events=dict(
+                displayName="Mmu_load_events Plugin",
                 displayVersion=self._plugin_version,
 
                 # version check: github repository
                 type="github_release",
                 user="cgspeck",
-                repo="OctoPrint-Mmu_events",
+                repo="OctoPrint-Mmu_load_events",
                 current=self._plugin_version,
 
                 # update method: pip
-                pip="https://github.com/cgspeck/OctoPrint-Mmu_events/archive/{target_version}.zip"
+                pip="https://github.com/cgspeck/OctoPrint-Mmu_load_events/archive/{target_version}.zip"
             )
         )
 
@@ -113,7 +113,7 @@ class Mmu_eventsPlugin(octoprint.plugin.SettingsPlugin,
 # If you want your plugin to be registered within OctoPrint under a different name than what you defined in setup.py
 # ("OctoPrint-PluginSkeleton"), you may define that here. Same goes for the other metadata derived from setup.py that
 # can be overwritten via __plugin_xyz__ control properties. See the documentation for that.
-__plugin_name__ = "MMU Events"
+__plugin_name__ = "MMU Load Events"
 
 # Starting with OctoPrint 1.4.0 OctoPrint will also support to run under Python 3 in addition to the deprecated
 # Python 2. New plugins should make sure to run under both versions for now. Uncomment one of the following
@@ -125,11 +125,11 @@ __plugin_pythoncompat__ = ">=2.7,<4" # python 2 and 3
 
 def __plugin_load__():
     global __plugin_implementation__
-    __plugin_implementation__ = Mmu_eventsPlugin()
+    __plugin_implementation__ = Mmu_load_eventsPlugin()
 
     global __plugin_hooks__
     __plugin_hooks__ = {
         "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information,
-        "octoprint.comm.protocol.gcode.received": Mmu_eventsPlugin.handle_gcode_received
+        "octoprint.comm.protocol.gcode.received": Mmu_load_eventsPlugin.handle_gcode_received
     }
 

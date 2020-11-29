@@ -1,20 +1,39 @@
-# OctoPrint-Mmu_events
+# OctoPrint-MMU_load_events
 
-**TODO:** Describe what your plugin does.
+This plugin monitors serial communication from your printer and dispatches the following events when it sees that the MMU2s has attempted a filament load, depending on the outcome:
+
+```python
+PLUGIN_MMU_LOAD_EVENTS_FAILED
+PLUGIN_MMU_LOAD_EVENTS_SUCCESS
+PLUGIN_MMU_LOAD_EVENTS_UNKNOWN
+```
+
+In the case of `SUCCESS` and `FAILED`, the event payload will contain the following members:
+
+- `line`: what was recieved from your printer
+- `filamentDetect`: the string describing IR Sensor readings:
+  - `o` = no filament detected
+  - `O` = filament detected
+- `success`: true or false depending on what happened
+
+In the case of a `FAILED` message, only `line` will be present.
 
 ## Setup
 
 Install via the bundled [Plugin Manager](https://docs.octoprint.org/en/master/bundledplugins/pluginmanager.html)
 or manually using this URL:
 
-    https://github.com/cgspeck/OctoPrint-Mmu_events/archive/master.zip
+    https://github.com/cgspeck/OctoPrint-MMU_load_events/archive/master.zip
 
-**TODO:** Describe how to install your plugin, if more needs to be done than just installing it via pip or through
-the plugin manager.
+Subscribe to events by creating/adding to the events section in Octoprint's `~/.octoprint/config.yaml`:
+
+```yaml
+
+```
 
 ## Configuration
 
-**TODO:** Describe your plugin's configuration options (if any).
+There is no configuration.
 
 ## Testing with Virtual printer
 
