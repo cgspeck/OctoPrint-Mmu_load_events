@@ -24,7 +24,6 @@ class Mmu_load_eventsPlugin(
         parts = self._line.split(" ")
         result_part = parts[-1]
         if result_part in ["succeeded.", "failed."]:
-            self._logger.info("succeded or failed!!!!!!!!!!!")
             succeeded = result_part == "succeeded."
             result_evt = (
                 Mmu_load_eventsPlugin.FAILED_EVENT,
@@ -32,7 +31,6 @@ class Mmu_load_eventsPlugin(
 
             cleaned_line = self._line.replace("echo:busy: processing", "")
             filament_detect = cleaned_line.split(" ")[-2].split(":")[-1]
-            self._logger.info("firing event!!!!!")
             eventManager().fire(result_evt, {"line": self._line, "filamentDetect": filament_detect, "success": succeeded})
             return True
 
@@ -41,10 +39,8 @@ class Mmu_load_eventsPlugin(
     ##~~ To process recieved gcode
     def handle_gcode_received(self, _comm_instance, line: str, *args, **kwargs):
         complete = False
-        self._logger.info("line: '{}'".format(line))
 
         if line.startswith("MMU can_load:"):
-            self._logger.info("xxxxxxxxxxxx FOUND STARTING STRING xxxxxxxxxxxx")
             self._hunting = True
             self._line = line
             complete = self._dispatch_if_complete(line)

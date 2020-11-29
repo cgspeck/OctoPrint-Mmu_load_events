@@ -6,8 +6,6 @@ sys.path.append(str(Path(dirname(__file__), "../").absolute()))
 sys.path.append(str(Path(dirname(__file__), "../../OctoPrint/src").absolute()))
 sys.path.append(str(Path(dirname(__file__), "../../OctoPrint/venv/lib/python3.8/site-packages").absolute()))
 
-import logging
-
 import pytest
 from mock import call
 
@@ -24,7 +22,6 @@ def test_ideal(mock_eventManager):
     comm_instance = None
     line = "MMU can_load:OOOooooooOOOOOOOOOOO succeeded."
     plugin = Mmu_load_eventsPlugin()
-    plugin._logger = logging.getLogger(__name__)
     plugin.handle_gcode_received(comm_instance, line=line)
     assert mock_eventManager.fire.call_args_list == [
         call('PLUGIN_MMU_LOAD_EVENTS_SUCCESS', {'line': 'MMU can_load:OOOooooooOOOOOOOOOOO succeeded.', 'filamentDetect': 'OOOooooooOOOOOOOOOOO', 'success': True})
@@ -70,6 +67,7 @@ SUCCESS_SAMPLES = [
 ]
 
 
+
 FAIL_SAMPLES = [
     [
         "echo:busy: processing",
@@ -107,7 +105,6 @@ FAIL_SAMPLES = [
 @pytest.mark.parametrize("log_lines", SUCCESS_SAMPLES)
 def test_success_real_world(mock_eventManager, log_lines):
     plugin = Mmu_load_eventsPlugin()
-    plugin._logger = logging.getLogger(__name__)
     for line in log_lines:
         plugin.handle_gcode_received(None, line=line)
 
@@ -117,7 +114,6 @@ def test_success_real_world(mock_eventManager, log_lines):
 @pytest.mark.parametrize("log_lines", FAIL_SAMPLES)
 def test_failed_real_world(mock_eventManager, log_lines):
     plugin = Mmu_load_eventsPlugin()
-    plugin._logger = logging.getLogger(__name__)
     for line in log_lines:
         plugin.handle_gcode_received(None, line=line)
 
