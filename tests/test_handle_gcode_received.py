@@ -58,6 +58,11 @@ SUCCESS_SAMPLES = [
         "MMU can_load:",
         "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO succeeded.",
         "echo:busy: processing",
+    ],
+    [
+        "MMU can_load:",
+        "OOOOOOOOOOOOOOOOOOOOOOOOOOOOecho:busy: processing",
+        "OO succeeded."
     ]
 ]
 

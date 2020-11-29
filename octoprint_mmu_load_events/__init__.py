@@ -56,8 +56,8 @@ class Mmu_load_eventsPlugin(
     ##~~ These events are sent by the hook above
     @staticmethod
     def register_custom_events_hook(*args, **kwargs):
-        # PLUGIN_MMU_LOAD_EVENTS_SUCCESS, PLUGIN_MMU_LOAD_EVENTS_FAILED, PLUGIN_MMU_LOAD_EVENTS_UNKNOWN
-        return ["success", "failed", "unknown"]
+        # PLUGIN_MMU_LOAD_EVENTS_SUCCESS, PLUGIN_MMU_LOAD_EVENTS_FAILED
+        return ["success", "failed"]
 
     ##~~ StartupPlugin
     def on_after_startup(self):
