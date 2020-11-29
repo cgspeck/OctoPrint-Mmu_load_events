@@ -11,6 +11,7 @@ import logging
 # Take a look at the documentation on what other plugin mixins are available.
 
 import octoprint.plugin
+from octoprint.events import eventManager
 
 class Mmu_eventsPlugin(octoprint.plugin.SettingsPlugin,
                        octoprint.plugin.AssetPlugin,
@@ -18,6 +19,9 @@ class Mmu_eventsPlugin(octoprint.plugin.SettingsPlugin,
                        octoprint.plugin.StartupPlugin,
                        octoprint.plugin.EventHandlerPlugin
 ):
+    FAILED_EVENT = "PLUGIN_MMU_EVENTS_LOAD_FAILED"
+    SUCCESS_EVENT = "PLUGIN_MMU_EVENTS_LOAD_SUCCESS"
+    UNKNOWN_EVENT = "PLUGIN_MMU_EVENTS_LOAD_UNKNOWN"
 
     ##~~ To process recieved gcode
     @staticmethod
@@ -30,13 +34,26 @@ class Mmu_eventsPlugin(octoprint.plugin.SettingsPlugin,
             if result_part in ["succeeded.", "failed."]:
                 succeeded = result_part == "succeeded."
                 result_str = ("failed", "succeded")[succeeded]
+                result_evt = (
+                    Mmu_eventsPlugin.FAILED_EVENT,
+                    Mmu_eventsPlugin.SUCCESS_EVENT)[succeeded]
+
                 filament_detect = parts[-2].split(":")[-1]
                 logger.info("Load MMU status: {}, filament detected: '{}'".format(result_str, filament_detect))
+                eventManager().fire(result_evt, {"line": line, "filamentDetect": filament_detect, "success": succeeded})
                 pass
             else:
                 logger.warning("Unable to determine MMU status, received '{}'".format(line))
+                eventManager().fire(Mmu_eventsPlugin.UNKNOWN_EVENT, {"line": line})
 
         return line
+
+    ##~~ These events are sent by the hook above
+    @staticmethod
+    def register_custom_events_hook(*args, **kwargs):
+        # plugin_mmu_events_foo
+        # PLUGIN_MMU_EVENTS_LOAD_SUCCESS
+        return ["load_success", "load_failed", "load_unknown"]
 
     ##~~ EventHandlerPlugin
     def on_event(self, event, payload):
