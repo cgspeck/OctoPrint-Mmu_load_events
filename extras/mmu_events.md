@@ -49,7 +49,6 @@ This plugin monitors serial communication from your printer and dispatches the f
 ```python
 PLUGIN_MMU_LOAD_EVENTS_FAILED
 PLUGIN_MMU_LOAD_EVENTS_SUCCESS
-PLUGIN_MMU_LOAD_EVENTS_UNKNOWN
 ```
 
 In the case of `SUCCESS` and `FAILED`, the event payload will contain the following members:
@@ -59,8 +58,6 @@ In the case of `SUCCESS` and `FAILED`, the event payload will contain the follow
   - `o` = no filament detected
   - `O` = filament detected
 - `success`: true or false depending on what happened
-
-In the case of a `FAILED` message, only `line` will be present.
 
 ## Setup
 
@@ -82,10 +79,6 @@ events:
     - command:
         - /home/pi/bin/notify-nodered-mmu "{__eventname}" "{line}" "{success}" "{filamentDetect}"
       event: PLUGIN_MMU_LOAD_EVENTS_FAILED
-      type: system
-    - command:
-        - /home/pi/bin/notify-nodered-mmu "{__eventname}" "{line}"
-      event: PLUGIN_MMU_LOAD_EVENTS_UNKNOWN
       type: system
 ```
 

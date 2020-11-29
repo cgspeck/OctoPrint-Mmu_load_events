@@ -5,7 +5,6 @@ This plugin monitors serial communication from your printer and dispatches the f
 ```python
 PLUGIN_MMU_LOAD_EVENTS_FAILED
 PLUGIN_MMU_LOAD_EVENTS_SUCCESS
-PLUGIN_MMU_LOAD_EVENTS_UNKNOWN
 ```
 
 In the case of `SUCCESS` and `FAILED`, the event payload will contain the following members:
@@ -15,8 +14,6 @@ In the case of `SUCCESS` and `FAILED`, the event payload will contain the follow
   - `o` = no filament detected
   - `O` = filament detected
 - `success`: true or false depending on what happened
-
-In the case of a `FAILED` message, only `line` will be present.
 
 ## Setup
 
@@ -39,10 +36,6 @@ events:
         - /home/pi/bin/notify-nodered-mmu "{__eventname}" "{line}" "{success}" "{filamentDetect}"
       event: PLUGIN_MMU_LOAD_EVENTS_FAILED
       type: system
-    - command:
-        - /home/pi/bin/notify-nodered-mmu "{__eventname}" "{line}"
-      event: PLUGIN_MMU_LOAD_EVENTS_UNKNOWN
-      type: system
 ```
 
 The `node-red/` folder contains a sample flow and the helper script I use to dispatch these events via email and [Pushover](https://pushover.net/).
@@ -58,5 +51,4 @@ Use the following commands in the Terminal to trigger this plugin:
 ```
 !!DEBUG:send MMU can_load:OOOooooooOOOOOOOOOOO succeeded.
 !!DEBUG:send MMU can_load:OOOooooooOOOOOOOOOOO failed.
-!!DEBUG:send MMU can_load:OOOooooooOOOOOOOOOOO foo bar
 ```

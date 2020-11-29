@@ -1,6 +1,5 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals
-import logging
 
 import octoprint.plugin
 from octoprint.events import eventManager
@@ -15,29 +14,42 @@ class Mmu_load_eventsPlugin(
 ):
     FAILED_EVENT = "PLUGIN_MMU_LOAD_EVENTS_FAILED"
     SUCCESS_EVENT = "PLUGIN_MMU_LOAD_EVENTS_SUCCESS"
-    UNKNOWN_EVENT = "PLUGIN_MMU_LOAD_EVENTS_UNKNOWN"
+
+    def __init__(self) -> None:
+        super(Mmu_load_eventsPlugin).__init__()
+        self._hunting = False
+        self._line = ""
+
+    def _dispatch_if_complete(self, line: str) -> bool:
+        parts = self._line.split(" ")
+        result_part = parts[-1]
+        if result_part in ["succeeded.", "failed."]:
+            succeeded = result_part == "succeeded."
+            result_evt = (
+                Mmu_load_eventsPlugin.FAILED_EVENT,
+                Mmu_load_eventsPlugin.SUCCESS_EVENT)[succeeded]
+
+            cleaned_line = self._line.replace("echo:busy: processing", "")
+            filament_detect = cleaned_line.split(" ")[-2].split(":")[-1]
+            eventManager().fire(result_evt, {"line": self._line, "filamentDetect": filament_detect, "success": succeeded})
+            return True
+
+        return False
 
     ##~~ To process recieved gcode
-    @staticmethod
-    def handle_gcode_received(_comm_instance, line: str, *args, **kwargs):
+    def handle_gcode_received(self, _comm_instance, line: str, *args, **kwargs):
+        complete = False
+
         if line.startswith("MMU can_load:"):
-            logger = logging.getLogger("octoprint.plugin." + __name__)
-            parts = line.split(" ")
-            result_part = parts[-1]
+            self._hunting = True
+            self._line = line
+            complete = self._dispatch_if_complete(line)
+        elif self._hunting:
+            self._line += line
+            complete = self._dispatch_if_complete(line)
 
-            if result_part in ["succeeded.", "failed."]:
-                succeeded = result_part == "succeeded."
-                result_str = ("failed", "succeded")[succeeded]
-                result_evt = (
-                    Mmu_load_eventsPlugin.FAILED_EVENT,
-                    Mmu_load_eventsPlugin.SUCCESS_EVENT)[succeeded]
-
-                filament_detect = parts[-2].split(":")[-1]
-                logger.info("Load MMU status: {}, filament detected: '{}'".format(result_str, filament_detect))
-                eventManager().fire(result_evt, {"line": line, "filamentDetect": filament_detect, "success": succeeded})
-            else:
-                logger.warning("Unable to determine MMU status, received '{}'".format(line))
-                eventManager().fire(Mmu_load_eventsPlugin.UNKNOWN_EVENT, {"line": line})
+        if complete:
+            self._hunting = False
 
         return line
 
@@ -71,12 +83,13 @@ class Mmu_load_eventsPlugin(
         )
 
 def __plugin_load__():
+    plugin = Mmu_load_eventsPlugin()
+
     global __plugin_implementation__
     __plugin_implementation__ = Mmu_load_eventsPlugin()
 
     global __plugin_hooks__
     __plugin_hooks__ = {
         "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information,
-        "octoprint.comm.protocol.gcode.received": Mmu_load_eventsPlugin.handle_gcode_received
+        "octoprint.comm.protocol.gcode.received": plugin.handle_gcode_received
     }
-

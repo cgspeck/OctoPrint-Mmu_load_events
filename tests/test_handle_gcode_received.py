@@ -1,4 +1,3 @@
-# import ipdb; ipdb.set_trace()
 import sys
 from pathlib import Path
 from os.path import dirname
@@ -22,7 +21,8 @@ def mock_eventManager(mocker):
 def test_ideal(mock_eventManager):
     comm_instance = None
     line = "MMU can_load:OOOooooooOOOOOOOOOOO succeeded."
-    Mmu_load_eventsPlugin.handle_gcode_received(comm_instance, line=line)
+    plugin = Mmu_load_eventsPlugin()
+    plugin.handle_gcode_received(comm_instance, line=line)
     assert mock_eventManager.fire.call_args_list == [
         call('PLUGIN_MMU_LOAD_EVENTS_SUCCESS', {'line': 'MMU can_load:OOOooooooOOOOOOOOOOO succeeded.', 'filamentDetect': 'OOOooooooOOOOOOOOOOO', 'success': True})
     ]
@@ -61,9 +61,56 @@ SUCCESS_SAMPLES = [
     ]
 ]
 
+
+
+FAIL_SAMPLES = [
+    [
+        "echo:busy: processing",
+        "MMU can_load:",
+        "OOOOOOOOOOOOOOOOOecho:busy: processing",
+        "OOOOO11111111 failed.",
+        "tmc2130_home_enter(axes_mask=0x04)",
+        "echo:busy: processing",
+    ],
+    [
+        "echo:busy: processing",
+        "MMU can_load:",
+        "OOOOOOOOOOOOOOOOOOOOOO11111111 failed.",
+        "echo:busy: processing",
+    ],
+    [
+        "MMU can_load:",
+        "OOOOOOOOOOOOOOOOOOOOOO11111111 failed.",
+        "echo:busy: processing",
+    ],
+    [
+        "echo:busy: processing",
+        "MMU can_load:",
+        "OOOOOOOOOOOOOOOOOOOOOO11111111 failed.",
+        "tmc2130_home_enter(axes_mask=0x04)",
+    ],
+    [
+        "echo:busy: processing",
+        "MMU can_load:",
+        "OOOOOOOOOOOOOOOOOOOOOO11111111 failed.",
+        "echo:busy: processing",
+    ]
+]
+
 @pytest.mark.parametrize("log_lines", SUCCESS_SAMPLES)
 def test_success_real_world(mock_eventManager, log_lines):
+    plugin = Mmu_load_eventsPlugin()
     for line in log_lines:
-        Mmu_load_eventsPlugin.handle_gcode_received(None, line=line)
+        plugin.handle_gcode_received(None, line=line)
 
-    assert mock_eventManager.fire.assert_called()
+    assert mock_eventManager.fire.call_args_list[0][0][0] == "PLUGIN_MMU_LOAD_EVENTS_SUCCESS"
+    assert mock_eventManager.fire.call_args_list[0][0][1]['filamentDetect'] == "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+
+@pytest.mark.parametrize("log_lines", FAIL_SAMPLES)
+def test_failed_real_world(mock_eventManager, log_lines):
+    plugin = Mmu_load_eventsPlugin()
+    for line in log_lines:
+        plugin.handle_gcode_received(None, line=line)
+
+    assert mock_eventManager.fire.call_args_list[0][0][0] == "PLUGIN_MMU_LOAD_EVENTS_FAILED"
+    assert mock_eventManager.fire.call_args_list[0][0][1]['filamentDetect'] == "OOOOOOOOOOOOOOOOOOOOOO11111111"
