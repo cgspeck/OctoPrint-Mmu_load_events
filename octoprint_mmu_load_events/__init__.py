@@ -42,10 +42,10 @@ class Mmu_load_eventsPlugin(
 
         if line.startswith("MMU can_load:"):
             self._hunting = True
-            self._line = line
+            self._line = line.strip()
             complete = self._dispatch_if_complete(line)
         elif self._hunting:
-            self._line += line
+            self._line += line.strip()
             complete = self._dispatch_if_complete(line)
 
         if complete:
