@@ -1,0 +1,23 @@
+#! /bin/bash -e
+node_endpoint=http://192.168.1.6:1880/octoprint_mmu
+event_name=$1
+line=$2
+success=$3
+filamentDetect=$4
+
+json_payload=$(jq -n -r \
+  --arg eventName "${event_name}" \
+  --arg line "${line}" \
+  --arg success "${success}" \
+  --arg filamentDetect "${filamentDetect}" \
+  '{ eventName: $eventName, line: $line, success: $success, filamentDetect: $filamentDetect }'
+)
+
+echo "Sending payload"
+echo $json_payload
+
+curl \
+  -H 'Content-type: application/json' \
+  -d "${json_payload}" \
+  $node_endpoint
+

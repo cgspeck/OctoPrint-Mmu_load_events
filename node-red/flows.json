@@ -1,0 +1,107 @@
+[
+  {
+    "id": "f07d965a.b6b228",
+    "type": "tab",
+    "label": "Octoprint MMU Notifications",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "98908838.27e068",
+    "type": "http in",
+    "z": "f07d965a.b6b228",
+    "name": "Octoprint Endpoint",
+    "url": "/octoprint_mmu",
+    "method": "post",
+    "upload": false,
+    "swaggerDoc": "",
+    "x": 110,
+    "y": 60,
+    "wires": [["e3a6ba1a.173bc8", "891b189.75001e8"]]
+  },
+  {
+    "id": "b1f9680e.504158",
+    "type": "e-mail",
+    "z": "f07d965a.b6b228",
+    "server": "mail.yourisp.com.au",
+    "port": "465",
+    "secure": true,
+    "tls": true,
+    "name": "your.email.address@example.com",
+    "dname": "",
+    "x": 720,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "5ea2d4f0.379dbc",
+    "type": "http response",
+    "z": "f07d965a.b6b228",
+    "name": "",
+    "statusCode": "",
+    "headers": {},
+    "x": 170,
+    "y": 200,
+    "wires": []
+  },
+  {
+    "id": "e3a6ba1a.173bc8",
+    "type": "template",
+    "z": "f07d965a.b6b228",
+    "name": "",
+    "field": "payload",
+    "fieldType": "msg",
+    "format": "handlebars",
+    "syntax": "plain",
+    "template": "{ \"result\": \"OK\" }",
+    "output": "json",
+    "x": 180,
+    "y": 120,
+    "wires": [["5ea2d4f0.379dbc"]]
+  },
+  {
+    "id": "2f09a524.ec212a",
+    "type": "pushover api",
+    "z": "f07d965a.b6b228",
+    "keys": "edb607a6.f818a8",
+    "title": "",
+    "name": "",
+    "x": 680,
+    "y": 140,
+    "wires": []
+  },
+  {
+    "id": "891b189.75001e8",
+    "type": "function",
+    "z": "f07d965a.b6b228",
+    "name": "Format for Distribution",
+    "func": "/* \nEmail: \n  Sends the msg.payload as an email, \n  with a subject of msg.topic.\n\nPushover\nmsg.payload: The message of the notification, supports a few html tags\n\nOptional Inputs\nmsg.topic: This will be used as the title of the notifcation if Title is not set\nmsg.priority: -2/-1/1/2. Default: 0 (normal)\n\nIf the priority is 2 (emergency), you should provide msg.retry and msg.expire.\n\nmsg.device: Default for all device if not provided. Seprated by a comma\nmsg.sound: Name of the notification sound, see the list\nmsg.timestamp: An unix timestamp to specific the date time of your notification\n*/\nvar memo = {};\n\nvar result_str = \"Unknown\"\n\nif (msg.payload.eventName == \"PLUGIN_MMU_LOAD_EVENTS_SUCCESS\") {\n    result_str = \"Succeeded\"\n} else if (msg.payload.eventName == \"PLUGIN_MMU_LOAD_EVENTS_FAILED\") {\n    result_str = \"Failed\"\n}\n\nmemo.topic = `OctoPrint MMU: Load ${result_str}`;\nmemo.timestamp = Date.now();\n\nconst { filamentDetect, line } = msg.payload;\n\nconst filamentDetectPart = (filamentDetect === \"\") ? \"\" : `Filament Detect Reads: ${filamentDetect}`;\nconst linePart = (result_str === \"Unknown\") ? `Received: '${line}'` : \"\";\n\nmemo.payload = `\nLoad ${result_str}\n${filamentDetectPart}\n${linePart}\n\nHappy printing!\n`\n\nmemo.__success = msg.payload.success;\nmemo.__result_str = msg.result_str;\n\nreturn memo;",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "x": 360,
+    "y": 60,
+    "wires": [["6a1f443.6d444bc"]]
+  },
+  {
+    "id": "6a1f443.6d444bc",
+    "type": "function",
+    "z": "f07d965a.b6b228",
+    "name": "Success Rate Limiter",
+    "func": "/* \nCancels flow if:\n\n* this message is a success message, the previous message was a success message and they were sent within threshold time of each other\n\n*/\nconst thisSuccess = msg.__success;\nconst threshold = 24 * 60 * 60 * 1000;\n\nif (thisSuccess === \"True\") {\n    let previousSuccessTimestamp = context.get('previousSuccessTimestamp')||0;\n    const thisTimestamp = msg.timestamp;\n    const rateLimited = (thisTimestamp - previousSuccessTimestamp) < threshold;\n\n    if (rateLimited) {\n        return null;\n    }\n    context.set('previousSuccessTimestamp', thisTimestamp);\n} else {\n    context.set('previousSuccessTimestamp', 0);\n}\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "x": 440,
+    "y": 140,
+    "wires": [["b1f9680e.504158", "2f09a524.ec212a"]]
+  },
+  {
+    "id": "edb607a6.f818a8",
+    "type": "pushover-keys",
+    "z": "",
+    "name": ""
+  }
+]

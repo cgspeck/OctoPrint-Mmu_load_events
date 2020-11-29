@@ -28,7 +28,21 @@ or manually using this URL:
 Subscribe to events by creating/adding to the events section in Octoprint's `~/.octoprint/config.yaml`:
 
 ```yaml
-
+events:
+  enabled: true
+  subscriptions:
+    - command:
+        - /home/pi/bin/notify-nodered-mmu "{__eventname}" "{line}" "{success}" "{filamentDetect}"
+      event: PLUGIN_MMU_LOAD_EVENTS_SUCCESS
+      type: system
+    - command:
+        - /home/pi/bin/notify-nodered-mmu "{__eventname}" "{line}" "{success}" "{filamentDetect}"
+      event: PLUGIN_MMU_LOAD_EVENTS_FAILED
+      type: system
+    - command:
+        - /home/pi/bin/notify-nodered-mmu "{__eventname}" "{line}"
+      event: PLUGIN_MMU_LOAD_EVENTS_UNKNOWN
+      type: system
 ```
 
 ## Configuration
