@@ -2,49 +2,28 @@
 layout: plugin
 
 id: mmu_load_events
-title: OctoPrint-Mmu_load_events
-description: TODO
+title: MMU Load Events
+description: Triggers Octoprint events in response to Prusa MMU2s filament load events
 authors:
   - Chris Speck
 license: AGPLv3
 
-# TODO
-date: today's date in format YYYY-MM-DD, e.g. 2015-04-21
+date: 2020-11-29
 
 homepage: https://github.com/cgspeck/OctoPrint-Mmu_load_events
 source: https://github.com/cgspeck/OctoPrint-Mmu_load_events
 archive: https://github.com/cgspeck/OctoPrint-Mmu_load_events/archive/master.zip
 
-# TODO
-# Set this to true if your plugin uses the dependency_links setup parameter to include
-# library versions not yet published on PyPi. SHOULD ONLY BE USED IF THERE IS NO OTHER OPTION!
-#follow_dependency_links: false
-
-# TODO
 tags:
-  - a list
-  - of tags
-  - that apply
-  - to your plugin
-  - (take a look at the existing plugins for what makes sense here)
-
-# TODO
-screenshots:
-  - url: url of a screenshot, /assets/img/...
-    alt: alt-text of a screenshot
-    caption: caption of a screenshot
-  - url: url of another screenshot, /assets/img/...
-    alt: alt-text of another screenshot
-    caption: caption of another screenshot
-  - ...
-
-# TODO
-featuredimage: url of a featured image for your plugin, /assets/img/...
-
-# TODO
-# You only need the following if your plugin requires specific OctoPrint versions or
-# specific operating systems to function - you can safely remove the whole
-# "compatibility" block if this is not the case.
+  - notifications
+  - events
+  - prusa
+  - mmu
+  - mmu2s
+  - node-red
+  - nodered
+  - pushover
+  - push-over
 
 compatibility:
   # List of compatible versions
@@ -58,43 +37,70 @@ compatibility:
   # OctoPrint versions being supported.
 
   octoprint:
-    - 1.2.0
+    - 1.4.0
 
-  # List of compatible operating systems
-  #
-  # Valid values:
-  #
-  # - windows
-  # - linux
-  # - macos
-  # - freebsd
-  #
-  # There are also two OS groups defined that get expanded on usage:
-  #
-  # - posix: linux, macos and freebsd
-  # - nix: linux and freebsd
-  #
-  # You can also remove the whole "os" block. Removing it will default to all
-  # operating systems being supported.
-
-  os:
-    - linux
-    - windows
-    - macos
-    - freebsd
-
-  # Compatible Python version
-  #
-  # Plugins should aim for compatibility for Python 2 and 3 for now, in which case the value should be ">=2.7,<4".
-  #
-  # Plugins that only wish to support Python 3 should set it to ">=3,<4".
-  #
-  # If your plugin only supports Python 2 (worst case, not recommended for newly developed plugins since Python 2
-  # is EOL), leave at ">=2.7,<3" - be aware that your plugin will not be allowed to register on the
-  # plugin repository if it only support Python 2.
-
-  python: ">=2.7,<3"
+  python: ">=2.7,<4"
 ---
 
-**TODO**: Longer description of your plugin, configuration examples etc. This part will be visible on the page at
-http://plugins.octoprint.org/plugin/mmu_load_events/
+# MMU load events
+
+This plugin monitors serial communication from your printer and dispatches the following events when it sees that the MMU2s has attempted a filament load, depending on the outcome:
+
+```python
+PLUGIN_MMU_LOAD_EVENTS_FAILED
+PLUGIN_MMU_LOAD_EVENTS_SUCCESS
+PLUGIN_MMU_LOAD_EVENTS_UNKNOWN
+```
+
+In the case of `SUCCESS` and `FAILED`, the event payload will contain the following members:
+
+- `line`: what was recieved from your printer
+- `filamentDetect`: the string describing IR Sensor readings:
+  - `o` = no filament detected
+  - `O` = filament detected
+- `success`: true or false depending on what happened
+
+In the case of a `FAILED` message, only `line` will be present.
+
+## Setup
+
+Install via the bundled [Plugin Manager](https://docs.octoprint.org/en/master/bundledplugins/pluginmanager.html)
+or manually using this URL:
+
+    https://github.com/cgspeck/OctoPrint-MMU_load_events/archive/master.zip
+
+Subscribe to events by creating/adding to the events section in Octoprint's `~/.octoprint/config.yaml`:
+
+```yaml
+events:
+  enabled: true
+  subscriptions:
+    - command:
+        - /home/pi/bin/notify-nodered-mmu "{__eventname}" "{line}" "{success}" "{filamentDetect}"
+      event: PLUGIN_MMU_LOAD_EVENTS_SUCCESS
+      type: system
+    - command:
+        - /home/pi/bin/notify-nodered-mmu "{__eventname}" "{line}" "{success}" "{filamentDetect}"
+      event: PLUGIN_MMU_LOAD_EVENTS_FAILED
+      type: system
+    - command:
+        - /home/pi/bin/notify-nodered-mmu "{__eventname}" "{line}"
+      event: PLUGIN_MMU_LOAD_EVENTS_UNKNOWN
+      type: system
+```
+
+The `node-red/` folder contains a sample flow and the helper script I use to dispatch these events via email and [Pushover](https://pushover.net/).
+
+## Configuration
+
+There is no configuration.
+
+## Testing with Virtual printer
+
+Use the following commands in the Terminal to trigger this plugin:
+
+```
+!!DEBUG:send MMU can_load:OOOooooooOOOOOOOOOOO succeeded.
+!!DEBUG:send MMU can_load:OOOooooooOOOOOOOOOOO failed.
+!!DEBUG:send MMU can_load:OOOooooooOOOOOOOOOOO foo bar
+```
