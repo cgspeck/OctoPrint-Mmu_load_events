@@ -1,0 +1,20 @@
+#! /bin/bash -e
+node_endpoint=http://192.168.1.6:1880/octoprint_mmu
+event_name=$1
+filepath=$2
+filename=$3
+
+json_payload=$(jq -n -r \
+  --arg eventName "${event_name}" \
+  --arg filePath "${filepath}" \
+  --arg fileName "${filename}" \
+  '{ eventName: $eventName, filePath: $filePath, fileName: $fileName }'
+)
+
+echo "Sending payload"
+echo $json_payload
+
+curl \
+  -H 'Content-type: application/json' \
+  -d "${json_payload}" \
+  $node_endpoint
