@@ -3,8 +3,9 @@
 This plugin monitors serial communication from your printer and dispatches the following events when it sees that the MMU2s has attempted a filament load, depending on the outcome:
 
 ```python
-PLUGIN_MMU_LOAD_EVENTS_FAILED
-PLUGIN_MMU_LOAD_EVENTS_SUCCESS
+PLUGIN_MMU_LOAD_EVENTS_FAILED  # MMU load failed
+PLUGIN_MMU_LOAD_EVENTS_PAUSED  # generic "paused for user" from printer
+PLUGIN_MMU_LOAD_EVENTS_SUCCESS  # MMU load succeeded
 ```
 
 In the case of `SUCCESS` and `FAILED`, the event payload will contain the following members:
@@ -30,11 +31,14 @@ events:
   subscriptions:
     - command:
         - /home/pi/bin/notify-nodered-mmu "{__eventname}" "{line}" "{success}" "{filamentDetect}"
-      event: PLUGIN_MMU_LOAD_EVENTS_SUCCESS
+      event:
+        - PLUGIN_MMU_LOAD_EVENTS_SUCCESS
+        - PLUGIN_MMU_LOAD_EVENTS_FAILED
       type: system
     - command:
-        - /home/pi/bin/notify-nodered-mmu "{__eventname}" "{line}" "{success}" "{filamentDetect}"
-      event: PLUGIN_MMU_LOAD_EVENTS_FAILED
+        - /home/pi/bin/notify-nodered-mmu "{__eventname}"
+      event:
+        - PLUGIN_MMU_LOAD_EVENTS_PAUSED
       type: system
 ```
 
@@ -51,4 +55,6 @@ Use the following commands in the Terminal to trigger this plugin:
 ```
 !!DEBUG:send MMU can_load:OOOooooooOOOOOOOOOOO succeeded.
 !!DEBUG:send MMU can_load:OOOooooooOOOOOOOOOOO failed.
+!!DEBUG:send MMU can_load:OOOooooooOOOOOOOOOOO succeeded.
+!!DEBUG:send echo:busy: paused for user
 ```

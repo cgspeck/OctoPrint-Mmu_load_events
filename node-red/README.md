@@ -10,11 +10,14 @@ events:
   subscriptions:
     - command:
         - /home/pi/bin/notify-nodered-mmu "{__eventname}" "{line}" "{success}" "{filamentDetect}"
-      event: PLUGIN_MMU_LOAD_EVENTS_SUCCESS
+      event:
+        - PLUGIN_MMU_LOAD_EVENTS_SUCCESS
+        - PLUGIN_MMU_LOAD_EVENTS_FAILED
       type: system
     - command:
-        - /home/pi/bin/notify-nodered-mmu "{__eventname}" "{line}" "{success}" "{filamentDetect}"
-      event: PLUGIN_MMU_LOAD_EVENTS_FAILED
+        - /home/pi/bin/notify-nodered-mmu "{__eventname}"
+      event:
+        - PLUGIN_MMU_LOAD_EVENTS_PAUSED
       type: system
     - command:
         - /home/pi/bin/notify-nodered "{__eventname}" "{__filepath}" "{__filename}"

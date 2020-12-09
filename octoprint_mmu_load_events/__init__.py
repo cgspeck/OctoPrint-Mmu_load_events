@@ -1,5 +1,6 @@
 # coding=utf-8
 from __future__ import absolute_import, unicode_literals
+import time
 
 import octoprint.plugin
 from octoprint.events import eventManager
@@ -13,11 +14,14 @@ class Mmu_load_eventsPlugin(
     octoprint.plugin.EventHandlerPlugin
 ):
     FAILED_EVENT = "PLUGIN_MMU_LOAD_EVENTS_FAILED"
+    PAUSED_EVENT = "PLUGIN_MMU_LOAD_EVENTS_PAUSED"
     SUCCESS_EVENT = "PLUGIN_MMU_LOAD_EVENTS_SUCCESS"
 
     def __init__(self) -> None:
         super(Mmu_load_eventsPlugin).__init__()
         self._hunting = False
+        self._pause_last_seen = 0
+        self._pause_threshold = 60
         self._line = ""
 
     def _dispatch_if_complete(self, line: str) -> bool:
@@ -41,12 +45,24 @@ class Mmu_load_eventsPlugin(
         complete = False
 
         if line.startswith("MMU can_load:"):
+            self._pause_alert_sent = False
             self._hunting = True
             self._line = line.strip()
             complete = self._dispatch_if_complete(line)
         elif self._hunting:
             self._line += line.strip()
             complete = self._dispatch_if_complete(line)
+        elif line.startswith("echo:busy: paused for user"):
+            print("triggered")
+            now = int(time.time())
+            if (now - self._pause_last_seen) >= self._pause_threshold:
+                print("sending message")
+                eventManager().fire(Mmu_load_eventsPlugin.PAUSED_EVENT)
+                print("after send")
+
+            print("update _pause_last_seen")
+            self._pause_last_seen = now
+            print(f"self._pause_last_seen: {self._pause_last_seen}")
 
         if complete:
             self._hunting = False
@@ -56,8 +72,8 @@ class Mmu_load_eventsPlugin(
     ##~~ These events are sent by the hook above
     @staticmethod
     def register_custom_events_hook(*args, **kwargs):
-        # PLUGIN_MMU_LOAD_EVENTS_SUCCESS, PLUGIN_MMU_LOAD_EVENTS_FAILED
-        return ["success", "failed"]
+        # PLUGIN_MMU_LOAD_EVENTS_FAILED, PLUGIN_MMU_LOAD_EVENTS_PAUSED, PLUGIN_MMU_LOAD_EVENTS_SUCCESS
+        return ["failed", "paused", "success"]
 
     ##~~ StartupPlugin
     def on_after_startup(self):
