@@ -8,7 +8,6 @@ from octoprint.events import eventManager
 
 __plugin_name__ = "MMU Load Events"
 __plugin_pythoncompat__ = ">=2.7,<4"  # python 2 and 3
-__plugin_version__ = "0.2.6"
 
 
 class Mmu_load_eventsPlugin(
