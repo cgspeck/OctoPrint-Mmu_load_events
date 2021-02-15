@@ -5,6 +5,7 @@ This plugin monitors serial communication from your printer and dispatches the f
 ```python
 PLUGIN_MMU_LOAD_EVENTS_FAILED  # MMU load failed
 PLUGIN_MMU_LOAD_EVENTS_PAUSED  # generic "paused for user" from printer
+PLUGIN_MMU_LOAD_EVENTS_RESUMED  # sent when printer appears to resume, if an 'ok' is seen after a pause
 PLUGIN_MMU_LOAD_EVENTS_SUCCESS  # MMU load succeeded
 ```
 
@@ -39,6 +40,7 @@ events:
         - /home/pi/bin/notify-nodered-mmu "{__eventname}"
       event:
         - PLUGIN_MMU_LOAD_EVENTS_PAUSED
+        - PLUGIN_MMU_LOAD_EVENTS_RESUMED
       type: system
 ```
 

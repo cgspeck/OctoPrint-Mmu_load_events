@@ -18,6 +18,7 @@ events:
         - /home/pi/bin/notify-nodered-mmu "{__eventname}"
       event:
         - PLUGIN_MMU_LOAD_EVENTS_PAUSED
+        - PLUGIN_MMU_LOAD_EVENTS_RESUMED
       type: system
     - command:
         - /home/pi/bin/notify-nodered "{__eventname}" "{__filepath}" "{__filename}"
@@ -26,10 +27,6 @@ events:
         - PrintFailed
         - PrintCancelled
         - PrintStarted
-      type: system
-    - command:
-        - /home/pi/bin/notify-nodered "{__eventname}" "{__filepath}" "{__filename}"
-      event: Startup
       type: system
 ```
 
