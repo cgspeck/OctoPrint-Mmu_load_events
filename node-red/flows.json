@@ -17,7 +17,13 @@
     "swaggerDoc": "",
     "x": 150,
     "y": 120,
-    "wires": [["e3a6ba1a.173bc8", "2ef2159.f041aea", "dc3eb5c0.0430e8"]]
+    "wires": [
+      [
+        "e3a6ba1a.173bc8",
+        "2ef2159.f041aea",
+        "dc3eb5c0.0430e8"
+      ]
+    ]
   },
   {
     "id": "b1f9680e.504158",
@@ -58,7 +64,11 @@
     "output": "json",
     "x": 140,
     "y": 180,
-    "wires": [["5ea2d4f0.379dbc"]]
+    "wires": [
+      [
+        "5ea2d4f0.379dbc"
+      ]
+    ]
   },
   {
     "id": "2f09a524.ec212a",
@@ -83,7 +93,12 @@
     "finalize": "",
     "x": 440,
     "y": 140,
-    "wires": [["2f09a524.ec212a", "b1f9680e.504158"]]
+    "wires": [
+      [
+        "2f09a524.ec212a",
+        "b1f9680e.504158"
+      ]
+    ]
   },
   {
     "id": "5fa2303d.19a5c",
@@ -307,7 +322,11 @@
     "topic": "",
     "x": 130,
     "y": 60,
-    "wires": [["2ef2159.f041aea"]]
+    "wires": [
+      [
+        "2ef2159.f041aea"
+      ]
+    ]
   },
   {
     "id": "495c623e.b07e7c",
@@ -456,7 +475,11 @@
     "topic": "",
     "x": 160,
     "y": 380,
-    "wires": [["2ef2159.f041aea"]]
+    "wires": [
+      [
+        "2ef2159.f041aea"
+      ]
+    ]
   },
   {
     "id": "fb24fa1.0be6e08",
@@ -509,28 +532,6 @@
     "wires": []
   },
   {
-    "id": "477e13f5.bac3dc",
-    "type": "ui_button",
-    "z": "f07d965a.b6b228",
-    "name": "",
-    "group": "52785d90.fa206c",
-    "order": 8,
-    "width": 0,
-    "height": 0,
-    "passthru": false,
-    "label": "Resume Stalled",
-    "tooltip": "Manually set status back to Printing after intervening to fix jam, broken filament etc",
-    "color": "",
-    "bgcolor": "",
-    "icon": "",
-    "payload": "{\"eventName\":\"printResumed\"}",
-    "payloadType": "json",
-    "topic": "",
-    "x": 1380,
-    "y": 320,
-    "wires": [["2ef2159.f041aea"]]
-  },
-  {
     "id": "37fd47e3.7e8278",
     "type": "ui_button",
     "z": "f07d965a.b6b228",
@@ -540,7 +541,7 @@
     "width": 0,
     "height": 0,
     "passthru": false,
-    "label": "Cancel Job",
+    "label": "Cancel Job Status",
     "tooltip": "Manually set status to Cancelled",
     "color": "",
     "bgcolor": "",
@@ -548,9 +549,13 @@
     "payload": "{\"eventName\":\"PrintCancelled\"}",
     "payloadType": "json",
     "topic": "",
-    "x": 1370,
+    "x": 1390,
     "y": 360,
-    "wires": [["2ef2159.f041aea"]]
+    "wires": [
+      [
+        "2ef2159.f041aea"
+      ]
+    ]
   },
   {
     "id": "edb607a6.f818a8",
